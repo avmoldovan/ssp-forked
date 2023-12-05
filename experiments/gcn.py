@@ -30,7 +30,7 @@ args = parser.parse_args()
 
 class Net_orig(torch.nn.Module):
     def __init__(self, dataset):
-        super(Net2, self).__init__()
+        super(Net_orig, self).__init__()
         self.conv1 = GCNConv(dataset.num_features, args.hidden)
         self.conv2 = GCNConv(args.hidden, dataset.num_classes)
 
