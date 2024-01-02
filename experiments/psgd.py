@@ -1,5 +1,6 @@
 import torch
 import torch.nn.functional as F
+from torch.nn import Linear
 from torch_scatter import scatter
 from torch.optim.optimizer import Optimizer
 
@@ -41,7 +42,7 @@ class KFAC(Optimizer):
                     i_sub_mod = 0
                     if hasattr(sub_mod, 'weight'):
                         assert i_sub_mod == 0
-                        handle = sub_mod.register_backward_hook(self._save_grad_output)
+                        handle = sub_mod.register_full_backward_hook(self._save_grad_output)
                         self._bwd_handles.append(handle)
                         
                         params = [sub_mod.weight]
@@ -117,11 +118,13 @@ class KFAC(Optimizer):
             
             self.mask = i[-1]
             
-    def _save_grad_output(self, mod, grad_input, grad_output):
+    def _save_grad_output(self, mod:Linear, grad_input, grad_output):
         """Saves grad on output of layer to compute covariance."""
         if mod.training:
             self.state[mod]['gy'] = grad_output[0] * grad_output[0].size(1)
-            self._cached_edge_index = mod._cached_edge_index
+            #breakpoint()
+            if hasattr(mod, '_cached_edge_index'):
+                self._cached_edge_index =  mod.edge_index, mod.edge_weight# mod._cached_edge_index
 
     def _precond(self, weight, bias, group, state):
         """Applies preconditioning."""

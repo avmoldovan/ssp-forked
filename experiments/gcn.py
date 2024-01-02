@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 import torch
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv
+from torch_geometric.nn import GCN2Conv
 from datasets import get_planetoid_dataset
 from train_eval import run
 
